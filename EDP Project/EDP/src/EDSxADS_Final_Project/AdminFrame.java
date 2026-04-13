@@ -424,7 +424,7 @@ public class AdminFrame extends JFrame {
             RegisterD.setVisible(true);
         });
 
-        //Bins Dialog Trigger
+        // Bins Dialog Trigger
         BinButton.addActionListener(e -> {
             BinsD = new JDialog(AdminF, "Recycle Status", true);
             BinsD.setSize(500, 280);
@@ -671,7 +671,6 @@ public class AdminFrame extends JFrame {
         });
 
         // Dashboard (Pie Chart)
-        //instantiate variables
         String[] depts = {"IT", "Engineering", "Business", "Education", "Medical", "Law"};
         double[] vals = loader.getCountsArray();
         Color[] cols = {Color.BLUE, Color.GREEN, Color.ORANGE, Color.MAGENTA, Color.CYAN, Color.PINK};

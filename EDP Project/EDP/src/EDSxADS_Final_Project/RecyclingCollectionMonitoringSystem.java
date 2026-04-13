@@ -40,8 +40,8 @@ class UniversityRecycleZone extends JFrame {
     JFrame MainF;
     JPanel header, UnivImageP, leftPanel, UserImageP, MainP, ColumnChart;
     JDialog Login, Contribution, History;
-    JLabel UnivIcon, UserIcon, UniversityL, UserL, AdminL, LoginL, UsernameL, PasswordL, ContributionL, SIDL, MTypeL, QuantityL, StudentCL, LocationL;
-    JButton AdminButton, AddContriButton, ViewContriButton, ClearButton, EnterButton, CancelButton, SearchButton;
+    JLabel UnivIcon, UserIcon, UniversityL, AdminL, LoginL, UsernameL, PasswordL, ContributionL, SIDL, MTypeL, QuantityL, StudentCL, LocationL;
+    JButton AdminButton, AddContriButton, ViewContriButton, ClearButton1, ClearButton2, EnterButton, CancelButton, SearchButton;
     JPasswordField Passwordfield;
     JTextField Usernamefield, IDfield, Quantityfield;
     JComboBox<String> MTypeBox, LTypeBox;
@@ -64,7 +64,6 @@ class UniversityRecycleZone extends JFrame {
         History = new JDialog(this, "User History", true);
         String[] Mtype = {"Plastic", "Glass", "Paper", "Metal", "E-Waste"};
         String[] LType = {"Engineering Building", "Canteen", "E-Library", "Pimentel"};
-
         MainP = new JPanel();
 
         //Column Chart
@@ -115,9 +114,6 @@ class UniversityRecycleZone extends JFrame {
         ScaledUserIcon = new ImageIcon(Logo2);
         UserIcon = new JLabel(ScaledUserIcon);
         UserIcon.setBounds(0, 0, 300, 250);
-        UserL = new JLabel("USER");
-        UserL.setFont(new Font("Arial", Font.BOLD, 30));
-        UserL.setBounds(160, 310, 100, 50);
         AddContriButton = new JButton("Add Contribution");
         AddContriButton.setBackground(Color.LIGHT_GRAY);
         AddContriButton.setFont(new Font("Arial", Font.BOLD, 30));
@@ -201,7 +197,7 @@ class UniversityRecycleZone extends JFrame {
                         JOptionPane.showMessageDialog(Contribution, "Invalid Quantity! Please enter a whole number (integers only).", "Input Error", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                  
+
                     try (Connection con = DBConnection.getConnection()) {
                         // Check if the Student is registered
                         String checkSql = "SELECT StudentNo FROM Students WHERE StudentNo = ?";
@@ -218,13 +214,12 @@ class UniversityRecycleZone extends JFrame {
                         }
 
                         // Get BinID based on selected location
-                    int binID = Bins.getBinIDFromLocation(LTypeBox.getSelectedItem().toString());
-                    if (binID == -1) {
-                        JOptionPane.showMessageDialog(Contribution, "Invalid Location selected!", "Error", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
+                        int binID = Bins.getBinIDFromLocation(LTypeBox.getSelectedItem().toString());
+                        if (binID == -1) {
+                            JOptionPane.showMessageDialog(Contribution, "Invalid Location selected!", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
 
-                    
                         // INSERT TRANSACTION
                         String sql = "INSERT INTO Transactions (StudentNo, MaterialType, Quantity) VALUES (?, ?, ?)";
                         PreparedStatement pst = con.prepareStatement(sql);
@@ -256,7 +251,7 @@ class UniversityRecycleZone extends JFrame {
             Contribution.setVisible(true);
         });
 
-        //View Contribution
+        // View Contribution
         ViewContriButton.addActionListener(e -> {
             History.setSize(850, 450);
             History.setLocationRelativeTo(this);
@@ -352,7 +347,6 @@ class UniversityRecycleZone extends JFrame {
         leftPanel.add(UserImageP);
         UserImageP.add(UserIcon);
         leftPanel.add(AddContriButton);
-        leftPanel.add(UserL);
         leftPanel.add(ViewContriButton);
         MainF.add(MainP, BorderLayout.CENTER);
         MainP.add(StudentCL);
@@ -365,11 +359,12 @@ class UniversityRecycleZone extends JFrame {
         MainF.setVisible(true);
     }
 
+    // Login Jpanel
     class LoginFunction extends JFrame {
 
         public LoginFunction() {
             AdminButton.addActionListener(e -> {
-                Login.setSize(550, 300);
+                Login.setSize(550, 270);
                 Login.setLocationRelativeTo(null);
                 Login.setLayout(null);
                 LoginL = new JLabel("LOGIN");
@@ -381,23 +376,27 @@ class UniversityRecycleZone extends JFrame {
                 UsernameL.setBounds(50, 60, 100, 25);
                 Login.add(UsernameL);
                 Usernamefield = new JTextField();
-                Usernamefield.setBounds(115, 60, 285, 30);
+                Usernamefield.setBounds(115, 60, 297, 30);
                 Login.add(Usernamefield);
 
-                JButton clearUser = new JButton("Clear");
-                clearUser.setBounds(410, 60, 80, 30);
-                Login.add(clearUser);
+                ClearButton1 = new JButton("Clear");
+                ClearButton1.setBounds(410, 60, 80, 30);
+                Login.add(ClearButton1);
+                
+                ClearButton2 = new JButton("Clear");
+                ClearButton2.setBounds(410, 110, 80, 30);
+                Login.add(ClearButton2);
 
                 PasswordL = new JLabel("Password:");
                 PasswordL.setBounds(50, 110, 100, 25);
                 Login.add(PasswordL);
 
                 Passwordfield = new JPasswordField();
-                Passwordfield.setBounds(115, 110, 285, 30);
+                Passwordfield.setBounds(115, 110, 297, 30);
                 Login.add(Passwordfield);
 
                 EnterButton = new JButton("Enter");
-                EnterButton.setBounds(150, 180, 100, 40);
+                EnterButton.setBounds(115, 165, 125, 50);
 
                 EnterButton.addActionListener(ev -> {
                     String user = Usernamefield.getText().trim();
@@ -423,14 +422,19 @@ class UniversityRecycleZone extends JFrame {
                     }
                 });
 
-                clearUser.addActionListener(ev -> {
+                // Clears Userfield only
+                ClearButton1.addActionListener(ev -> {
                     Usernamefield.setText("");
+                });
+
+                // Clears Passwordfield only
+                ClearButton2.addActionListener(ev -> {
                     Passwordfield.setText("");
                 });
 
                 Login.add(EnterButton);
                 CancelButton = new JButton("Cancel");
-                CancelButton.setBounds(270, 180, 100, 40);
+                CancelButton.setBounds(285, 165, 125, 50);
                 Login.add(CancelButton);
                 CancelButton.addActionListener(ev -> Login.dispose());
 
