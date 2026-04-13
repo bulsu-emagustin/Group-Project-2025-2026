@@ -84,7 +84,7 @@ public class AdminFrame extends JFrame {
 
         // Selections for JComboBox
         String[] DType = {"All Departments", "IT", "Engineering", "Business", "Education", "Medical", "Law"};
-        
+
         String[] MType = {"All Materials", "Plastic", "Glass", "Paper", "Metal", "E-Waste"};
         String[] LType = {"Engineering Building", "Canteen", "E-Library", "Pimentel"};
         String[] CType = {"BSIT", "BSCS", "BSIS", "BSCE", "BSEE", "BSME", "BSECE", "BSBA", "BSA", "BSMA", "BEEd", "BSEd", "BSN", "BSMT", "BSPSY", "BSCrim", "BPA", "LM"};
@@ -395,7 +395,17 @@ public class AdminFrame extends JFrame {
 
             //Register Student
             RegisterStudent Registration = new RegisterStudent();
-            RegisterButton.addActionListener(ex -> Registration.studentRegistration());
+            
+            RegisterButton.addActionListener(ex -> {
+                //check if fields are empty
+                if (IDfield.getText().isBlank() || FNamefield.getText().isBlank()
+                        || LNamefield.getText().isBlank() || Secfield.getText().isBlank()) {
+
+                    JOptionPane.showMessageDialog(RegisterD, "All fields (except Middle Name) are required!", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                } else{
+                    Registration.studentRegistration();
+                }     
+            });
 
             CancelButton = new JButton("Cancel");
             CancelButton.setBounds(260, 515, 130, 50);
@@ -452,7 +462,7 @@ public class AdminFrame extends JFrame {
                 String location = LocationBox.getSelectedItem().toString();
                 StatusTA.setText(Bins.getBinStatusByLocation(location));
             });
-            
+
             EmptyBinButton.addActionListener(ev -> bins.clearBin(empty));
 
             CancelButton = new JButton("Cancel");
