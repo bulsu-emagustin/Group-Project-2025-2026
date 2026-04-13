@@ -540,13 +540,13 @@ public class AdminFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, "Record saved!");
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Connection Error");
             }
 
             isEditing = false;
             Table.setDefaultEditor(Object.class, null);
         });
-
+        
         // Delete Button Logic
         DeleteButton.addActionListener(e -> {
             int[] selectedRows = Table.getSelectedRows();
@@ -585,10 +585,29 @@ public class AdminFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, "Record(s) deleted!");
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Connection Error");
             }
         });
+        
+        //Student Update Button Logic
+        StudentUpdateButton.addActionListener(e -> {
+            int selectedRow = StudentTable.getSelectedRow();
 
+            if (!isEditing) {
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(null, "Select row to update");
+                    return;
+                }
+
+                isEditing = true;
+
+                // Enable editing
+                StudentTable.setDefaultEditor(Object.class, new javax.swing.DefaultCellEditor(new JTextField()));
+
+                JOptionPane.showMessageDialog(null, "You can now edit the selected row.\nPress Save to save changes.");
+            }
+        });
+        
         // Student Save Button Logic
         StudentSaveButton.addActionListener(e -> {
             if (!isEditing) {
@@ -633,7 +652,7 @@ public class AdminFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, "Student record saved!");
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Connection Error");
             }
 
             isEditing = false;
@@ -676,7 +695,7 @@ public class AdminFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, "Student(s) deleted!");
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Connection Error");
             }
         });
 
@@ -889,7 +908,7 @@ public class AdminFrame extends JFrame {
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Search Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Connection Error");
             }
         }
     }
@@ -1053,7 +1072,7 @@ public class AdminFrame extends JFrame {
                 RegisterD.dispose();
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Connection Error");
             }
         }
 
