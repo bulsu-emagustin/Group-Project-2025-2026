@@ -395,7 +395,17 @@ public class AdminFrame extends JFrame {
 
             //Register Student
             RegisterStudent Registration = new RegisterStudent();
-            RegisterButton.addActionListener(ex -> Registration.studentRegistration());
+
+            RegisterButton.addActionListener(ex -> {
+                //check if fields are empty
+                if (IDfield.getText().isBlank() || FNamefield.getText().isBlank()
+                        || LNamefield.getText().isBlank() || Secfield.getText().isBlank()) {
+
+                    JOptionPane.showMessageDialog(RegisterD, "All fields (except Middle Name) are required!", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    Registration.studentRegistration();
+                }
+            });
 
             CancelButton = new JButton("Cancel");
             CancelButton.setBounds(260, 515, 130, 50);
@@ -530,7 +540,7 @@ public class AdminFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, "Record saved!");
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Connection Error");
             }
 
             isEditing = false;
@@ -575,11 +585,10 @@ public class AdminFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, "Record(s) deleted!");
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Connection Error");
             }
         });
 
-        
         // Update button for Student Records
         StudentUpdateButton.addActionListener(e -> {
             int selectedRow = StudentTable.getSelectedRow();
@@ -686,7 +695,7 @@ public class AdminFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, "Student(s) deleted!");
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Connection Error");
             }
         });
 
@@ -901,7 +910,7 @@ public class AdminFrame extends JFrame {
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Search Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Connection Error");
             }
         }
     }
@@ -1096,7 +1105,7 @@ public class AdminFrame extends JFrame {
                 RegisterD.dispose();
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Connection Error");
             }
         }
 
