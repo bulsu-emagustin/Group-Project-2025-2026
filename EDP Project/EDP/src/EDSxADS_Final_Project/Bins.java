@@ -10,11 +10,16 @@ public class Bins {
 
     public static int getBinIDFromLocation(String location) {
         switch (location) {
-            case "Engineering Building": return 1;
-            case "Canteen": return 2;
-            case "Pimentel": return 3;
-            case "E-Library": return 4;
-            default: return -1;
+            case "Engineering Building":
+                return 1;
+            case "Canteen":
+                return 2;
+            case "E-Library":
+                return 3;
+            case "Pimentel":
+                return 4;
+            default:
+                return -1;
         }
     }
 
@@ -23,7 +28,9 @@ public class Bins {
         String updateSql = "UPDATE RecycleBins SET Status = ? WHERE BinID = ?";
 
         try (Connection con = DBConnection.getConnection()) {
-            if (con == null) return;
+            if (con == null) {
+                return;
+            }
 
             int totalQuantity = 0;
 
@@ -65,10 +72,11 @@ public class Bins {
     public static void clearBin(String binID) {
         String sql = "UPDATE RecycleBins SET Status = 'Empty' WHERE BinID = ?";
 
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement pst = con.prepareStatement(sql)) {
+        try (Connection con = DBConnection.getConnection(); PreparedStatement pst = con.prepareStatement(sql)) {
 
-            if (con == null) return;
+            if (con == null) {
+                return;
+            }
 
             pst.setString(1, binID);
             int rowsAffected = pst.executeUpdate();
@@ -86,26 +94,27 @@ public class Bins {
     // GET BIN STATUS BY LOCATION
     public static String getBinStatusByLocation(String location) {
 
-    int binID = getBinIDFromLocation(location);
-    if (binID == -1) return "Invalid location.";
-
-    String sql = "SELECT Status FROM RecycleBins WHERE BinID = ?";
-
-    try (Connection con = DBConnection.getConnection();
-         PreparedStatement pst = con.prepareStatement(sql)) {
-
-        pst.setInt(1, binID);
-        ResultSet rs = pst.executeQuery();
-
-        if (rs.next()) {
-            return rs.getString("Status");
-        } else {
-            return "No data found.";
+        int binID = getBinIDFromLocation(location);
+        if (binID == -1) {
+            return "Invalid location.";
         }
 
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return "Error retrieving data.";
+        String sql = "SELECT Status FROM RecycleBins WHERE BinID = ?";
+
+        try (Connection con = DBConnection.getConnection(); PreparedStatement pst = con.prepareStatement(sql)) {
+
+            pst.setInt(1, binID);
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("Status");
+            } else {
+                return "No data found.";
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Error retrieving data.";
+        }
     }
-}
 }
