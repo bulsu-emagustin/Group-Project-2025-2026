@@ -12,8 +12,8 @@ public class Bins {
         switch (location) {
             case "Engineering Building": return 1;
             case "Canteen": return 2;
-            case "E-Library": return 3;
-            case "Pimentel": return 4;
+            case "Pimentel": return 3;
+            case "E-Library": return 4;
             default: return -1;
         }
     }
