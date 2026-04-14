@@ -84,7 +84,7 @@ public class AdminFrame extends JFrame {
 
         // Selections for JComboBox
         String[] DType = {"All Departments", "IT", "Engineering", "Business", "Education", "Medical", "Law"};
-
+        
         String[] MType = {"All Materials", "Plastic", "Glass", "Paper", "Metal", "E-Waste"};
         String[] LType = {"Engineering Building", "Canteen", "E-Library", "Pimentel"};
         String[] CType = {"BSIT", "BSCS", "BSIS", "BSCE", "BSEE", "BSME", "BSECE", "BSBA", "BSA", "BSMA", "BEEd", "BSEd", "BSN", "BSMT", "BSPSY", "BSCrim", "BPA", "LM"};
@@ -395,17 +395,7 @@ public class AdminFrame extends JFrame {
 
             //Register Student
             RegisterStudent Registration = new RegisterStudent();
-
-            RegisterButton.addActionListener(ex -> {
-                //check if fields are empty
-                if (IDfield.getText().isBlank() || FNamefield.getText().isBlank()
-                        || LNamefield.getText().isBlank() || Secfield.getText().isBlank()) {
-
-                    JOptionPane.showMessageDialog(RegisterD, "All fields (except Middle Name) are required!", "Validation Error", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    Registration.studentRegistration();
-                }
-            });
+            RegisterButton.addActionListener(ex -> Registration.studentRegistration());
 
             CancelButton = new JButton("Cancel");
             CancelButton.setBounds(260, 515, 130, 50);
@@ -462,7 +452,7 @@ public class AdminFrame extends JFrame {
                 String location = LocationBox.getSelectedItem().toString();
                 StatusTA.setText(Bins.getBinStatusByLocation(location));
             });
-
+            
             EmptyBinButton.addActionListener(ev -> bins.clearBin(empty));
 
             CancelButton = new JButton("Cancel");
@@ -540,7 +530,7 @@ public class AdminFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, "Record saved!");
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Connection Error");
+                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
             }
 
             isEditing = false;
@@ -585,26 +575,7 @@ public class AdminFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, "Record(s) deleted!");
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Connection Error");
-            }
-        });
-
-        // Update button for Student Records
-        StudentUpdateButton.addActionListener(e -> {
-            int selectedRow = StudentTable.getSelectedRow();
-
-            if (!isEditing) {
-                if (selectedRow == -1) {
-                    JOptionPane.showMessageDialog(null, "Select row to update");
-                    return;
-                }
-
-                isEditing = true;
-
-                // Enable editing
-                StudentTable.setDefaultEditor(Object.class, new javax.swing.DefaultCellEditor(new JTextField()));
-
-                JOptionPane.showMessageDialog(null, "You can now edit the selected row.\nPress Save to save changes.");
+                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
             }
         });
 
@@ -695,7 +666,7 @@ public class AdminFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, "Student(s) deleted!");
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Connection Error");
+                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
             }
         });
 
@@ -835,8 +806,7 @@ public class AdminFrame extends JFrame {
                         + "INNER JOIN Students s ON t.StudentNo = s.StudentNo "
                         + "WHERE (t.StudentNo = ? OR ? = '') "
                         + "AND s.Department LIKE ? "
-                        + "AND t.MaterialType LIKE ? "
-                        + "ORDER BY t.TransactionID ASC";
+                        + "AND t.MaterialType LIKE ?";
 
                 PreparedStatement pst = con.prepareStatement(sql);
                 pst.setString(1, id);
@@ -847,9 +817,11 @@ public class AdminFrame extends JFrame {
                 ResultSet rs = pst.executeQuery();
                 model.setRowCount(0);
                 while (rs.next()) {
+                    int binID = rs.getInt("BinID");
+                    Object binIDValue = rs.wasNull() ? "" : binID;
                     model.addRow(new Object[]{
                         rs.getInt("TransactionID"),
-                        rs.getObject("BinID"),
+                        binIDValue,
                         rs.getInt("StudentNo"),
                         rs.getString("Department"),
                         rs.getString("MaterialType"),
@@ -910,7 +882,7 @@ public class AdminFrame extends JFrame {
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Connection Error");
+                JOptionPane.showMessageDialog(null, "Search Error: " + ex.getMessage());
             }
         }
     }
@@ -922,7 +894,7 @@ public class AdminFrame extends JFrame {
         private int busCount = 0;
         private int eduCount = 0;
         private int medCount = 0;
-        private int lawCount = 0;
+        private int crimCount = 0;
 
         private int plasticTot, glassTot, paperTot, metalTot, eWasteTot;
 
@@ -966,7 +938,7 @@ public class AdminFrame extends JFrame {
         //method for fetching Deparment counts
         public void updateDepartmentCounts() {
 
-            itCount = engCount = busCount = eduCount = medCount = lawCount = 0;
+            itCount = engCount = busCount = eduCount = medCount = crimCount = 0;
 
             String sql = "SELECT Department, COUNT(*) AS Total FROM Students GROUP BY Department";
 
@@ -978,23 +950,23 @@ public class AdminFrame extends JFrame {
 
                     //
                     switch (dept) {
-                        case "IT":
+                        case "Information Technology":
                             itCount = total;
                             break;
-                        case "Engineering":
+                        case "Civil Engineering":
                             engCount = total;
                             break;
-                        case "Business":
+                        case "Business Administration":
                             busCount = total;
                             break;
                         case "Education":
                             eduCount = total;
                             break;
-                        case "Medical":
+                        case "Medical Technology":
                             medCount = total;
                             break;
-                        case "Law":
-                            lawCount = total;
+                        case "Criminology":
+                            crimCount = total;
                             break;
                     }
                 }
@@ -1005,7 +977,7 @@ public class AdminFrame extends JFrame {
 
         // return the val to an array
         public double[] getCountsArray() {
-            return new double[]{itCount, engCount, busCount, eduCount, medCount, lawCount};
+            return new double[]{itCount, engCount, busCount, eduCount, medCount, crimCount};
         }
 
         //return material val to the charts
@@ -1042,37 +1014,6 @@ public class AdminFrame extends JFrame {
         private String StudSpec;
         private String YearLevel;
 
-        private String getDepartmentByCourse(String course) {
-            switch (course) {
-                case "BSIT":
-                case "BSCS":
-                case "BSIS":
-                    return "IT";
-                case "BSCE":
-                case "BSEE":
-                case "BSME":
-                case "BSECE":
-                    return "Engineering";
-                case "BSBA":
-                case "BSA":
-                case "BSMA":
-                    return "Business";
-                case "BEEd":
-                case "BSEd":
-                    return "Education";
-                case "BSN":
-                case "BSPSY":
-                    return "Medical";
-                case "BSMT":
-                case "BSCrim":
-                case "BPA":
-                case "LM":
-                    return "Law";
-                default:
-                    return "Unknown";
-            }
-        }
-
         public void studentRegistration() {
             try (Connection con = DBConnection.getConnection()) {
 
@@ -1081,7 +1022,7 @@ public class AdminFrame extends JFrame {
                 StudMname = MNamefield.getText();
                 StudLname = LNamefield.getText();
                 Course = CTypeBox.getSelectedItem().toString();
-                Department = getDepartmentByCourse(Course);
+                Department = STypeBox.getSelectedItem().toString();
                 Section = Secfield.getText();
                 StudSpec = STypeBox.getSelectedItem().toString();
                 YearLevel = SYTypeBox.getSelectedItem().toString();
@@ -1105,7 +1046,7 @@ public class AdminFrame extends JFrame {
                 RegisterD.dispose();
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Connection Error");
+                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
             }
         }
 

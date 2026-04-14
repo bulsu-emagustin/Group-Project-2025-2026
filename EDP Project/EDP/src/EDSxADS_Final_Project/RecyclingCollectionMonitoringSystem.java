@@ -222,12 +222,13 @@ class UniversityRecycleZone extends JFrame {
                         }
 
                         // INSERT TRANSACTION
-                        String sql = "INSERT INTO Transactions (StudentNo, MaterialType, Quantity) VALUES (?, ?, ?)";
+                        String sql = "INSERT INTO Transactions (BinID, StudentNo, MaterialType, Quantity) VALUES (?, ?, ?, ?)";
                         PreparedStatement pst = con.prepareStatement(sql);
 
-                        pst.setLong(1, id);
-                        pst.setString(2, MTypeBox.getSelectedItem().toString());
-                        pst.setLong(3, qty);
+                        pst.setInt(1, binID);
+                        pst.setLong(2, id);
+                        pst.setString(3, MTypeBox.getSelectedItem().toString());
+                        pst.setLong(4, qty);
 
                         int rows = pst.executeUpdate();
                         if (rows > 0) {
