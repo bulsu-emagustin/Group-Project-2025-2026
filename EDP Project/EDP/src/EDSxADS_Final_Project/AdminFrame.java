@@ -84,7 +84,7 @@ public class AdminFrame extends JFrame {
 
         // Selections for JComboBox
         String[] DType = {"All Departments", "IT", "Engineering", "Business", "Education", "Medical", "Law"};
-        
+
         String[] MType = {"All Materials", "Plastic", "Glass", "Paper", "Metal", "E-Waste"};
         String[] LType = {"Engineering Building", "Canteen", "E-Library", "Pimentel"};
         String[] CType = {"BSIT", "BSCS", "BSIS", "BSCE", "BSEE", "BSME", "BSECE", "BSBA", "BSA", "BSMA", "BEEd", "BSEd", "BSN", "BSMT", "BSPSY", "BSCrim", "BPA", "LM"};
@@ -395,18 +395,17 @@ public class AdminFrame extends JFrame {
 
             //Register Student
             RegisterStudent Registration = new RegisterStudent();
-            
+
             RegisterButton.addActionListener(ex -> {
                 //check if fields are empty
                 if (IDfield.getText().isBlank() || FNamefield.getText().isBlank()
                         || LNamefield.getText().isBlank() || Secfield.getText().isBlank()) {
 
                     JOptionPane.showMessageDialog(RegisterD, "All fields (except Middle Name) are required!", "Validation Error", JOptionPane.ERROR_MESSAGE);
-                } else{
+                } else {
                     Registration.studentRegistration();
-                }     
+                }
             });
-
 
             CancelButton = new JButton("Cancel");
             CancelButton.setBounds(260, 515, 130, 50);
@@ -453,24 +452,32 @@ public class AdminFrame extends JFrame {
             StatusL.setBounds(61, 120, 50, 30);
             StatusTA = new JTextArea();
             StatusTA.setBounds(105, 123, 330, 30);
+           
+            // Initial status load
+            StatusTA.setText(Bins.getBinStatusByLocation(LocationBox.getSelectedItem().toString()));
+            
             EmptyBinButton = new JButton("Empty Bin");
             EmptyBinButton.setBounds(80, 180, 150, 50);
-
-            Bins bins = new Bins();
-            String empty = StatusTA.toString();
+            CancelButton = new JButton("Cancel");
+            CancelButton.setBounds(250, 180, 150, 50);
 
             LocationBox.addActionListener(ev -> {
                 String location = LocationBox.getSelectedItem().toString();
                 StatusTA.setText(Bins.getBinStatusByLocation(location));
             });
-            
-            EmptyBinButton.addActionListener(ev -> bins.clearBin(empty));
 
-            CancelButton = new JButton("Cancel");
-            CancelButton.setBounds(250, 180, 150, 50);
+            EmptyBinButton.addActionListener(ev -> {
+                
+                String loc = LocationBox.getSelectedItem().toString();
+                int binID = Bins.getBinIDFromLocation(loc);
+                if (binID != -1) {
+                    Bins.clearBin(binID);
+                    StatusTA.setText("Empty");
+                }
+            });
+
             CancelButton.addActionListener(ev -> BinsD.dispose());
 
-            //Adding Components
             BinsD.add(RecycleBinL);
             BinsD.add(LocationL);
             BinsD.add(LocationBox);
@@ -500,7 +507,6 @@ public class AdminFrame extends JFrame {
             }
         });
 
-        // Save Button Logic
         SaveButton.addActionListener(e -> {
             if (!isEditing) {
                 JOptionPane.showMessageDialog(null, "Press Update first to enable editing.");
@@ -520,32 +526,51 @@ public class AdminFrame extends JFrame {
             try (Connection con = DBConnection.getConnection()) {
                 DefaultTableModel tableModel = (DefaultTableModel) Table.getModel();
 
+                // Get values from table safely
                 int transactionId = Integer.parseInt(tableModel.getValueAt(selectedRow, 0).toString());
+                int binID = Integer.parseInt(tableModel.getValueAt(selectedRow, 1).toString());
                 String department = tableModel.getValueAt(selectedRow, 3).toString();
                 String material = tableModel.getValueAt(selectedRow, 4).toString();
                 int quantity = Integer.parseInt(tableModel.getValueAt(selectedRow, 5).toString());
 
+                // Validate if BinID EXISTS
+                String checkSql = "SELECT COUNT(*) FROM RecycleBins WHERE BinID = ?";
+                try (PreparedStatement checkPst = con.prepareStatement(checkSql)) {
+                    checkPst.setInt(1, binID);
+                    ResultSet rs = checkPst.executeQuery();
+                    if (rs.next() && rs.getInt(1) == 0) {
+                        JOptionPane.showMessageDialog(null, "Error: Bin ID " + binID + " does not exist.\nCheck the RecycleBins table for valid IDs.");
+                        return;
+                    }
+                }
+
+                // Perform update
                 String sql = "UPDATE Transactions t "
                         + "INNER JOIN Students s ON t.StudentNo = s.StudentNo "
-                        + "SET s.Department=?, t.MaterialType=?, t.Quantity=? "
-                        + "WHERE t.TransactionID=?";
+                        + "SET s.Department = ?, t.MaterialType = ?, t.Quantity = ?, t.BinID = ? "
+                        + "WHERE t.TransactionID = ?";
 
-                PreparedStatement pst = con.prepareStatement(sql);
-                pst.setString(1, department);
-                pst.setString(2, material);
-                pst.setInt(3, quantity);
-                pst.setInt(4, transactionId);
+                try (PreparedStatement pst = con.prepareStatement(sql)) {
+                    pst.setString(1, department);
+                    pst.setString(2, material);
+                    pst.setInt(3, quantity);
+                    pst.setInt(4, binID);
+                    pst.setInt(5, transactionId);
 
-                pst.executeUpdate();
+                    pst.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Record updated successfully!");
+                }
 
-                JOptionPane.showMessageDialog(null, "Record saved!");
+                // Finalize state
+                isEditing = false;
+                Table.setDefaultEditor(Object.class, null);
 
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Connection Error");
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(null, "Invalid number format in Bin ID or Quantity.");
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage());
             }
-
-            isEditing = false;
-            Table.setDefaultEditor(Object.class, null);
         });
 
         // Delete Button Logic
@@ -589,7 +614,7 @@ public class AdminFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, "Connection Error");
             }
         });
-        
+
         //Student Update Button Logic
         StudentUpdateButton.addActionListener(e -> {
             int selectedRow = StudentTable.getSelectedRow();
@@ -1044,17 +1069,29 @@ public class AdminFrame extends JFrame {
 
         private String getDepartmentByCourse(String course) {
             switch (course) {
-                case "BSIT": case "BSCS": case "BSIS":
+                case "BSIT":
+                case "BSCS":
+                case "BSIS":
                     return "IT";
-                case "BSCE": case "BSEE": case "BSME": case "BSECE":
+                case "BSCE":
+                case "BSEE":
+                case "BSME":
+                case "BSECE":
                     return "Engineering";
-                case "BSBA": case "BSA": case "BSMA":
+                case "BSBA":
+                case "BSA":
+                case "BSMA":
                     return "Business";
-                case "BEEd": case "BSEd":
+                case "BEEd":
+                case "BSEd":
                     return "Education";
-                case "BSN": case "BSPSY":
+                case "BSN":
+                case "BSPSY":
                     return "Medical";
-                case "BSMT": case "BSCrim": case "BPA": case "LM":
+                case "BSMT":
+                case "BSCrim":
+                case "BPA":
+                case "LM":
                     return "Law";
                 default:
                     return "Unknown";
