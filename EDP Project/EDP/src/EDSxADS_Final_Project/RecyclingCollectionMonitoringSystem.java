@@ -108,6 +108,7 @@ class UniversityRecycleZone extends JFrame {
         leftPanel.setBackground(new Color(50, 205, 50));
         leftPanel.setPreferredSize(new Dimension(400, 800));
         leftPanel.setLayout(null);
+        
         UserImageP.setBounds(50, 50, 300, 250);
         UserImageP.setLayout(null);
         UserIconL = new ImageIcon("UserIcon.png");
@@ -170,6 +171,7 @@ class UniversityRecycleZone extends JFrame {
 
             // Handler for addition
             EnterButton.addActionListener(ev -> {
+                
                 try {
                     // Check if fields are empty
                     if (IDfield.getText().trim().isEmpty() || Quantityfield.getText().trim().isEmpty()) {
@@ -204,6 +206,7 @@ class UniversityRecycleZone extends JFrame {
                         String checkSql = "SELECT StudentNo FROM Students WHERE StudentNo = ?";
                         PreparedStatement checkPst = con.prepareStatement(checkSql);
                         checkPst.setLong(1, id);
+                        
                         ResultSet rs = checkPst.executeQuery();
 
                         if (!rs.next()) {
