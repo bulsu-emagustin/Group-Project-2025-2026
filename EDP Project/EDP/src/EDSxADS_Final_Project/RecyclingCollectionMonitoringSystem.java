@@ -22,7 +22,6 @@ import java.sql.PreparedStatement;
 import javax.swing.JOptionPane;
 import java.sql.ResultSet;
 import javax.swing.table.DefaultTableModel;
-import java.sql.SQLException;
 import javax.swing.JPasswordField;
 
 public class RecyclingCollectionMonitoringSystem {
@@ -173,12 +172,13 @@ class UniversityRecycleZone extends JFrame {
             EnterButton.addActionListener(ev -> {
                 
                 try {
+                    
                     // Check if fields are empty
                     if (IDfield.getText().trim().isEmpty() || Quantityfield.getText().trim().isEmpty()) {
                         JOptionPane.showMessageDialog(Contribution, "Please fill all fields!", "Input Error", JOptionPane.WARNING_MESSAGE);
                         return;
-                    }
-
+                    } else {
+                    
                     // Validate ID format
                     long id;
                     try {
@@ -242,11 +242,16 @@ class UniversityRecycleZone extends JFrame {
                             Contribution.dispose();
                         }
                     }
+                        
+                    }
+                    
+                    
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(Contribution, "Database Error: " + ex.getMessage());
                 }
             });
+                    
 
             CancelButton.addActionListener(ev -> {
                 IDfield.setText("");

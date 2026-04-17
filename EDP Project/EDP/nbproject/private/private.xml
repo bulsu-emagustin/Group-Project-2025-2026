@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="2">
+        <file>
+            <url>src/EDSxADS_Final_Project/WeeklyColumnChart.java</url>
+            <bookmark id="2">
+                <name/>
+                <line>0</line>
+                <key/>
+            </bookmark>
+        </file>
         <file>
             <url>src/EDSxADS_Final_Project/DBConnection.java</url>
             <bookmark id="1">
@@ -12,10 +20,11 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/agust/OneDrive/Documents/NetBeansProjects/New%20Folder/Group-Project-2025-2026/EDP%20Project/EDP/src/EDSxADS_Final_Project/DBConnection.java</file>
-            <file>file:/C:/Users/agust/OneDrive/Documents/NetBeansProjects/New%20Folder/Group-Project-2025-2026/EDP%20Project/EDP/src/EDSxADS_Final_Project/WeeklyColumnChart.java</file>
-            <file>file:/C:/Users/agust/OneDrive/Documents/NetBeansProjects/New%20Folder/Group-Project-2025-2026/EDP%20Project/EDP/src/EDSxADS_Final_Project/AdminFrame.java</file>
-            <file>file:/C:/Users/agust/OneDrive/Documents/NetBeansProjects/New%20Folder/Group-Project-2025-2026/EDP%20Project/EDP/src/EDSxADS_Final_Project/RecyclingCollectionMonitoringSystem.java</file>
+            <file>file:/C:/Users/user/Documents/NetBeansProjects/Group-Project-2025-2026/EDP%20Project/EDP/src/EDSxADS_Final_Project/RecyclingCollectionMonitoringSystem.java</file>
+            <file>file:/C:/Users/user/Documents/NetBeansProjects/Group-Project-2025-2026/EDP%20Project/EDP/src/EDSxADS_Final_Project/WeeklyColumnChart.java</file>
+            <file>file:/C:/Users/user/Documents/NetBeansProjects/Group-Project-2025-2026/EDP%20Project/EDP/src/EDSxADS_Final_Project/AdminFrame.java</file>
+            <file>file:/C:/Users/user/Documents/NetBeansProjects/Group-Project-2025-2026/EDP%20Project/EDP/src/EDSxADS_Final_Project/WelcomeFrame.java</file>
+            <file>file:/C:/Users/user/Documents/NetBeansProjects/Group-Project-2025-2026/EDP%20Project/EDP/src/EDSxADS_Final_Project/Bins.java</file>
         </group>
     </open-files>
 </project-private>

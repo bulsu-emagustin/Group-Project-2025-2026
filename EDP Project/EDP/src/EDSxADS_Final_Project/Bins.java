@@ -62,8 +62,9 @@ public class Bins {
     }
 
     public static void clearBin(int binID) {
-        String resetBinStatus = "UPDATE RecycleBins SET Status = 'Empty' WHERE BinID = ?";
-
+        
+        String resetBinStatus = "UPDATE RecycleBins SET Status = 'Empty' WHERE BinID =?";
+        
         try (Connection con = DBConnection.getConnection()) {
             if (con == null) return;
             
