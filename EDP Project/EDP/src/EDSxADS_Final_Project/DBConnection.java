@@ -100,7 +100,7 @@ public class DBConnection {
         }
     }
 
-    // Role-Based Connection 
+    // Connection 
     public static Connection getConnection() {
         try {
             return DriverManager.getConnection(
