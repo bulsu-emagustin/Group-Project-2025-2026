@@ -452,10 +452,10 @@ public class AdminFrame extends JFrame {
             StatusL.setBounds(61, 120, 50, 30);
             StatusTA = new JTextArea();
             StatusTA.setBounds(105, 123, 330, 30);
-           
+
             // Initial status load
             StatusTA.setText(Bins.getBinStatusByLocation(LocationBox.getSelectedItem().toString()));
-            
+
             EmptyBinButton = new JButton("Empty Bin");
             EmptyBinButton.setBounds(80, 180, 150, 50);
             CancelButton = new JButton("Cancel");
@@ -467,7 +467,7 @@ public class AdminFrame extends JFrame {
             });
 
             EmptyBinButton.addActionListener(ev -> {
-                
+
                 String loc = LocationBox.getSelectedItem().toString();
                 int binID = Bins.getBinIDFromLocation(loc);
                 if (binID != -1) {
@@ -508,6 +508,7 @@ public class AdminFrame extends JFrame {
         });
 
         SaveButton.addActionListener(e -> {
+
             if (!isEditing) {
                 JOptionPane.showMessageDialog(null, "Press Update first to enable editing.");
                 return;
@@ -518,6 +519,7 @@ public class AdminFrame extends JFrame {
             }
 
             int selectedRow = Table.getSelectedRow();
+
             if (selectedRow == -1) {
                 JOptionPane.showMessageDialog(null, "No row selected.");
                 return;
@@ -636,11 +638,13 @@ public class AdminFrame extends JFrame {
 
         // Student Save Button Logic
         StudentSaveButton.addActionListener(e -> {
+
             if (!isEditing) {
                 JOptionPane.showMessageDialog(null, "Press Update first to enable editing.");
                 return;
             }
 
+            // Safety: Stop cell editing before saving to ensure data is committed to the model
             if (StudentTable.isEditing()) {
                 StudentTable.getCellEditor().stopCellEditing();
             }
@@ -659,28 +663,38 @@ public class AdminFrame extends JFrame {
                 String middleName = tableModel.getValueAt(selectedRow, 2).toString();
                 String lastName = tableModel.getValueAt(selectedRow, 3).toString();
                 String course = tableModel.getValueAt(selectedRow, 4).toString();
-                String section = tableModel.getValueAt(selectedRow, 5).toString();
+                String section = tableModel.getValueAt(selectedRow, 5).toString(); // Was previously causing Index 5 error if length was 5
                 String specialization = tableModel.getValueAt(selectedRow, 6).toString();
-                String YearLevel = tableModel.getValueAt(selectedRow, 7).toString();
+                String yearLevel = tableModel.getValueAt(selectedRow, 7).toString();
 
                 String sql = "UPDATE Students SET FirstName=?, MiddleName=?, LastName=?, Course=?, Section=?, Specialization=?, YearLevel=? WHERE StudentNo=?";
-                PreparedStatement pst = con.prepareStatement(sql);
-                pst.setString(1, firstName);
-                pst.setString(2, middleName);
-                pst.setString(3, lastName);
-                pst.setString(4, course);
-                pst.setString(5, section);
-                pst.setString(6, specialization);
-                pst.setString(7, YearLevel);
-                pst.setInt(8, studentNo);
 
-                pst.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Student record saved!");
+                try (PreparedStatement pst = con.prepareStatement(sql)) {
+                    pst.setString(1, firstName);
+                    pst.setString(2, middleName);
+                    pst.setString(3, lastName);
+                    pst.setString(4, course);
+                    pst.setString(5, section);
+                    pst.setString(6, specialization);
+                    pst.setString(7, yearLevel);
+                    pst.setInt(8, studentNo);
 
+                    int rowsUpdated = pst.executeUpdate();
+                    if (rowsUpdated > 0) {
+                        JOptionPane.showMessageDialog(null, "Student record saved successfully!");
+                    }
+                }
+
+            } catch (ArrayIndexOutOfBoundsException aio) {
+                JOptionPane.showMessageDialog(null, "Logic Error: Table layout mismatch. Expected 8 columns.");
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(null, "Error: Student Number must be a valid integer.");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Connection Error");
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Database Error");
             }
 
+            // Reset editing state
             isEditing = false;
             StudentTable.setDefaultEditor(Object.class, null);
         });
@@ -1073,26 +1087,32 @@ public class AdminFrame extends JFrame {
                 case "BSCS":
                 case "BSIS":
                     return "IT";
+
                 case "BSCE":
                 case "BSEE":
                 case "BSME":
                 case "BSECE":
                     return "Engineering";
+
                 case "BSBA":
                 case "BSA":
                 case "BSMA":
                     return "Business";
+
                 case "BEEd":
                 case "BSEd":
                     return "Education";
+
                 case "BSN":
                 case "BSPSY":
                     return "Medical";
+
                 case "BSMT":
                 case "BSCrim":
                 case "BPA":
                 case "LM":
                     return "Law";
+
                 default:
                     return "Unknown";
             }
